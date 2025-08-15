@@ -18,5 +18,6 @@ RUN ant
 # Run exist-db and add xar-packages #
 #####################################
 FROM stadlerpeter/existdb:6.3.0
+ENV EXIST_PASSWORD=changeme
 
 COPY --chown=wegajetty --from=builder /opt/app/build-xar/*.xar ${EXIST_HOME}/autodeploy/
