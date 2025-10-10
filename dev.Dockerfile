@@ -19,4 +19,7 @@ RUN ant
 #####################################
 FROM stadlerpeter/existdb:6.3.0
 
+ARG EXIST_PASSWORD
+ENV EXIST_PASSWORD=${EXIST_PASSWORD}
+
 COPY --chown=wegajetty --from=builder /opt/app/build-xar/*.xar ${EXIST_HOME}/autodeploy/
