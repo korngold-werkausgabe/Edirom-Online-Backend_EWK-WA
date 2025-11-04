@@ -12,6 +12,7 @@ xquery version "3.1";
 (: IMPORTS ================================================================= :)
 
 import module namespace edition = "http://www.edirom.de/xquery/edition" at "../xqm/edition.xqm";
+import module namespace eutil = "http://www.edirom.de/xquery/eutil" at "../xqm/eutil.xqm";
 
 (: NAMESPACE DECLARATIONS ================================================== :)
 
@@ -30,7 +31,7 @@ declare option output:indent "yes";
 let $mode := request:get-parameter('mode', '')
 let $edition := request:get-parameter('edition', '')
 
-let $file := doc($edition:default-prefs-location)
+let $file := doc($eutil:default-prefs-location)
 
 let $projectFile := doc(edition:getPreferencesURI($edition))
 
@@ -44,7 +45,17 @@ return
         let $data := 
             map:merge((
                 $file//entry ! map:entry(./string(@key), ./string(@value)), 
-                $projectFile//entry ! map:entry(./string(@key), ./string(@value))  
+                $projectFile//entry ! map:entry(./string(@key), ./string(@value)),
+                map:entry(
+                    "web-components",
+                    map:merge(
+                        $file//web-component ! map:entry(./string(@key),
+                            map:merge(
+                                .//option ! map:entry(./string(@key), ./string(@value))
+                            )
+                        )
+                    )
+                )
             ))
         return
             response:stream($data => serialize($outputOptions), $serializationParameters)
