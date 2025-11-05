@@ -3,7 +3,7 @@
 # 1. set up the build environment and build the expath-package
 # 2. run the eXist-db
 #########################
-FROM openjdk:17-jdk-bullseye as builder
+FROM eclipse-temurin:21 AS builder
 
 RUN apt-get update \
 && apt-get install -y --no-install-recommends ant 
