@@ -44,7 +44,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev-ewk'
+    if: github.event_name == 'push'
     steps:
       - name: Download XAR Artifact
         uses: actions/download-artifact@v4
