@@ -16,24 +16,37 @@ jobs:
         with:
           submodules: true
 
-      - name: Install dependencies
+      - name: Create Dockerfile
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-11-jre git
+          cat > Dockerfile << 'EOF'
+          FROM eclipse-temurin:21 AS builder
 
-      - name: Copy Sencha CMD Dockerfile
-        run: |
-          git clone --depth 1 https://github.com/bwbohl/sencha-cmd.git /tmp/sencha-cmd
-          cp /tmp/sencha-cmd/Dockerfile ${{ github.workspace }}/Dockerfile
+          RUN apt-get update \
+          && apt-get install -y --no-install-recommends ant 
+
+          WORKDIR /opt/app
+
+          COPY . .
+
+          RUN ant
+          EOF
+
+      - name: Upload Dockerfile artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dockerfile
+          path: Dockerfile
 
       - name: Build Docker Image
         run: |
-          docker build -f ${{ github.workspace }}/Dockerfile -t edirom-online-build .
-        working-directory: ${{ github.workspace }}
+          docker build -t edirom-online-build .
 
-      - name: Run Build in Container
+      - name: Extract XAR from container
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app -w /app edirom-online-build "ant"
+          docker create --name builder edirom-online-build
+          mkdir -p build-xar
+          docker cp builder:/opt/app/build-xar/. ./build-xar/
+          docker rm builder
 
       - name: Upload XAR artifact
         uses: actions/upload-artifact@v4
@@ -75,6 +88,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Download Dockerfile artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dockerfile
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -97,7 +115,7 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/edirom-online-backend-ewk
-            ${{ secrets.DOCKERHUB_USERNAME }}/edirom-online-backend-ewk
+            ${{ secrets.DOCKERHUB_USERNAME != '' && format('{0}/edirom-online-backend-ewk', secrets.DOCKERHUB_USERNAME) || '' }}
           tags: |
             type=raw,value=latest
             type=sha,prefix={{branch}}-
@@ -106,7 +124,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./dev.Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
