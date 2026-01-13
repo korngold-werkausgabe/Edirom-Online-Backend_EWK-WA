@@ -115,7 +115,7 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/edirom-online-backend-ewk
-            ${{ secrets.DOCKERHUB_USERNAME != '' && format('{0}/edirom-online-backend-ewk', secrets.DOCKERHUB_USERNAME) || '' }}
+            korngoldwerkausgabe/edirom-online-backend-ewk
           tags: |
             type=raw,value=latest
             type=sha,prefix={{branch}}-
