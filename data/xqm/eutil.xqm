@@ -80,7 +80,8 @@ declare function eutil:getLocalizedName($node as element(), $lang as xs:string) 
 
     (: identify the context for further processing:)
     let $case := ( 'child::mei:title'[$node/mei:title], 'child::mei:name'[$node/mei:name], 
-                   'child::mei:label'[$node/mei:label], 'child::edirom:names'[$node/edirom:names], 
+                   'child::mei:label'[$node/mei:label], 'child::edirom:names'[$node/edirom:names],
+                   'child::edirom:labels'[$node/edirom:labels],
                    'self::mei:annot'[$node[self::mei:annot]], 'other' )[1]
         
 
@@ -106,6 +107,14 @@ declare function eutil:getLocalizedName($node as element(), $lang as xs:string) 
                 $node/edirom:names/edirom:name[@xml:lang = $lang]/node() || ''
             else
                 $node/edirom:names/edirom:name[1]/node() || ''
+        )
+        
+        (: if current node has child edirom:labels :)
+        else if ($case eq 'child::edirom:labels') then (
+            if ($lang = $node/edirom:labels/edirom:label/@xml:lang) then
+                $node/edirom:labels/edirom:label[@xml:lang = $lang]/node() || ''
+            else
+                $node/edirom:labels/edirom:label[1]/node() || ''
         )
         
         (: if current node is an mei:annot :)
