@@ -1,0 +1,72 @@
+name: Build and Release Backend XAR
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev-ewk
+      - bug/9-gh-action-fails
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Create Dockerfile for building Edirom Online Backend
+        run: |
+          cat > Dockerfile << 'EOF'
+          FROM eclipse-temurin:21 AS builder
+
+          RUN apt-get update \
+          && apt-get install -y --no-install-recommends ant 
+
+          WORKDIR /opt/app
+
+          COPY . .
+
+          RUN ant
+          EOF
+
+      - name: Build Docker Image for building Edirom Online Backend
+        run: |
+          docker build -t edirom-online-build .
+
+      - name: Extract Edirom Online Backend XAR from container
+        run: |
+          docker create --name builder edirom-online-build
+          mkdir -p build-xar
+          docker cp builder:/opt/app/build-xar/. ./build-xar/
+          docker rm builder
+
+      - name: Upload XAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eob-ewk
+          path: build-xar/*.xar
+          
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Download XAR Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: eob-ewk
+
+      - name: Rename XAR file
+        run: |
+          mv Edirom-Online-Backend*.xar eob-ewk-latest.xar
+
+      - name: Upload XAR to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          files: eob-ewk-latest.xar
+          name: Latest Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
