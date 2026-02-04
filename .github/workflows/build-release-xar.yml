@@ -1,4 +1,4 @@
-name: Build and Release Backend XAR
+name: build-release-xar
 
 on:
   workflow_dispatch:

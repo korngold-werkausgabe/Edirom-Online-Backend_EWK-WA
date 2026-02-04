@@ -1,9 +1,9 @@
-name: Build and Release Docker
+name: build-release-docker
 
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Build and Release Backend XAR"]
+    workflows: ["build-release-xar"]
     types:
       - completed
     branches:
