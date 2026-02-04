@@ -25,7 +25,7 @@ jobs:
 
       - name: Download XAR from latest release
         run: |
-          gh release download latest --pattern "eob-ewk-latest.xar"
+          gh release download latest --repo ${{ github.repository }} --pattern "eob-ewk-latest.xar"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
