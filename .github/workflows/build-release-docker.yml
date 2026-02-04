@@ -18,16 +18,16 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Wait for release to be available
-        run: |
-          echo "Waiting for release to propagate..."
-          sleep 10
+      - name: Download XAR artifact from build workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: eob-ewk
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Download XAR from latest release
+      - name: Rename XAR file
         run: |
-          gh release download latest --pattern "eob-ewk-latest.xar"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          mv Edirom-Online-Backend*.xar eob-ewk-latest.xar
 
       - name: Create Dockerfile for Edirom Online Backend
         run: |
