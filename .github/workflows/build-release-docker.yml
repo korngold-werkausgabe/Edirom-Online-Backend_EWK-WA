@@ -33,8 +33,10 @@ jobs:
         run: |
           cat > Dockerfile << 'EOF'
           FROM stadlerpeter/existdb:6.3.0
-          ENV EXIST_ENV=production
-          ENV EXIST_DEFAULT_APP_PATH=xmldb:exist:///db/apps/Edirom-Online
+          ARG EXIST_ENV=production
+          ARG EXIST_DEFAULT_APP_PATH=xmldb:exist:///db/apps/Edirom-Online-Backend
+          ENV EXIST_ENV=$EXIST_ENV
+          ENV EXIST_DEFAULT_APP_PATH=$EXIST_DEFAULT_APP_PATH
 
           COPY --chown=wegajetty eob-ewk-latest.xar ${EXIST_HOME}/autodeploy/
           EOF
