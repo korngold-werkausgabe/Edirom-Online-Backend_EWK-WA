@@ -1,0 +1,132 @@
+name: release-docker-image
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_sha:
+        description: "Git SHA of the build to release"
+        required: false
+        type: string
+      run_id:
+        description: "Run ID where the artifact was created"
+        required: false
+        type: string
+
+env:
+  DOCKER_IMAGE: korngoldwerkausgabe/edirom-online-backend-ewk
+  GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/edirom-online-backend-ewk
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Determine build SHA
+        id: build_sha
+        run: |
+          if [ -n "${{ inputs.build_sha }}" ]; then
+            echo "sha=${{ inputs.build_sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determine run ID
+        id: run_info
+        run: |
+          if [ -n "${{ inputs.run_id }}" ]; then
+            echo "run_id=${{ inputs.run_id }}" >> $GITHUB_OUTPUT
+          else
+            echo "run_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download Docker images artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images-${{ steps.build_sha.outputs.sha }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ steps.run_info.outputs.run_id }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load Docker images
+        id: load_image
+        run: |
+          # Load both platform images
+          docker load --input docker-image-amd64.tar
+          docker load --input docker-image-arm64.tar
+          
+          # Get the image names
+          AMD64_IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "amd64" | head -1)
+          ARM64_IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "arm64" | head -1)
+          
+          echo "amd64_image=$AMD64_IMAGE" >> $GITHUB_OUTPUT
+          echo "arm64_image=$ARM64_IMAGE" >> $GITHUB_OUTPUT
+          echo "Loaded AMD64: $AMD64_IMAGE"
+          echo "Loaded ARM64: $ARM64_IMAGE"
+          docker image ls -a
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker Hub
+        id: meta_dockerhub
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_IMAGE }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix={{branch}}-
+
+      - name: Extract metadata for GHCR
+        id: meta_ghcr
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.GHCR_IMAGE }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix={{branch}}-
+
+      - name: Push multi-arch manifest to Docker Hub
+        run: |
+          # Tag and push individual platform images to Docker Hub
+          for tag in $(echo "${{ steps.meta_dockerhub.outputs.tags }}" | tr ',' '\n'); do
+            docker tag ${{ steps.load_image.outputs.amd64_image }} ${tag}-amd64
+            docker tag ${{ steps.load_image.outputs.arm64_image }} ${tag}-arm64
+            docker push ${tag}-amd64
+            docker push ${tag}-arm64
+            
+            # Create and push manifest
+            docker manifest create ${tag} \
+              ${tag}-amd64 \
+              ${tag}-arm64
+            docker manifest push ${tag}
+          done
+
+      - name: Push multi-arch manifest to GHCR
+        run: |
+          # Tag and push individual platform images to GHCR
+          for tag in $(echo "${{ steps.meta_ghcr.outputs.tags }}" | tr ',' '\n'); do
+            docker tag ${{ steps.load_image.outputs.amd64_image }} ${tag}-amd64
+            docker tag ${{ steps.load_image.outputs.arm64_image }} ${tag}-arm64
+            docker push ${tag}-amd64
+            docker push ${tag}-arm64
+            
+            # Create and push manifest
+            docker manifest create ${tag} \
+              ${tag}-amd64 \
+              ${tag}-arm64
+            docker manifest push ${tag}
+          done
