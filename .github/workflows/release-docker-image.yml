@@ -87,8 +87,9 @@ jobs:
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
-            type=raw,value=latest
+            type=ref,event=branch
             type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Extract metadata for GHCR
         id: meta_ghcr
@@ -96,37 +97,58 @@ jobs:
         with:
           images: ${{ env.GHCR_IMAGE }}
           tags: |
-            type=raw,value=latest
+            type=ref,event=branch
             type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Push multi-arch manifest to Docker Hub
+      - name: Create and push multi-platform manifest to Docker Hub
         run: |
-          # Tag and push individual platform images to Docker Hub
-          for tag in $(echo "${{ steps.meta_dockerhub.outputs.tags }}" | tr ',' '\n'); do
-            docker tag ${{ steps.load_image.outputs.amd64_image }} ${tag}-amd64
-            docker tag ${{ steps.load_image.outputs.arm64_image }} ${tag}-arm64
-            docker push ${tag}-amd64
-            docker push ${tag}-arm64
-            
-            # Create and push manifest
-            docker manifest create ${tag} \
-              ${tag}-amd64 \
-              ${tag}-arm64
-            docker manifest push ${tag}
+          AMD64_IMAGE="${{ steps.load_image.outputs.amd64_image }}"
+          ARM64_IMAGE="${{ steps.load_image.outputs.arm64_image }}"
+          
+          # Tag and push individual platform images
+          echo "${{ steps.meta_dockerhub.outputs.tags }}" | while read tag; do
+            if [ -n "$tag" ]; then
+              echo "Processing tag: $tag"
+              
+              # Tag and push amd64
+              docker tag "$AMD64_IMAGE" "${tag}-amd64"
+              docker push "${tag}-amd64"
+              
+              # Tag and push arm64
+              docker tag "$ARM64_IMAGE" "${tag}-arm64"
+              docker push "${tag}-arm64"
+              
+              # Create and push manifest
+              docker manifest create "$tag" \
+                --amend "${tag}-amd64" \
+                --amend "${tag}-arm64"
+              docker manifest push "$tag"
+            fi
           done
 
-      - name: Push multi-arch manifest to GHCR
+      - name: Create and push multi-platform manifest to GitHub Container Registry
         run: |
-          # Tag and push individual platform images to GHCR
-          for tag in $(echo "${{ steps.meta_ghcr.outputs.tags }}" | tr ',' '\n'); do
-            docker tag ${{ steps.load_image.outputs.amd64_image }} ${tag}-amd64
-            docker tag ${{ steps.load_image.outputs.arm64_image }} ${tag}-arm64
-            docker push ${tag}-amd64
-            docker push ${tag}-arm64
-            
-            # Create and push manifest
-            docker manifest create ${tag} \
-              ${tag}-amd64 \
-              ${tag}-arm64
-            docker manifest push ${tag}
+          AMD64_IMAGE="${{ steps.load_image.outputs.amd64_image }}"
+          ARM64_IMAGE="${{ steps.load_image.outputs.arm64_image }}"
+          
+          # Tag and push individual platform images
+          echo "${{ steps.meta_ghcr.outputs.tags }}" | while read tag; do
+            if [ -n "$tag" ]; then
+              echo "Processing tag: $tag"
+              
+              # Tag and push amd64
+              docker tag "$AMD64_IMAGE" "${tag}-amd64"
+              docker push "${tag}-amd64"
+              
+              # Tag and push arm64
+              docker tag "$ARM64_IMAGE" "${tag}-arm64"
+              docker push "${tag}-arm64"
+              
+              # Create and push manifest
+              docker manifest create "$tag" \
+                --amend "${tag}-amd64" \
+                --amend "${tag}-arm64"
+              docker manifest push "$tag"
+            fi
           done
