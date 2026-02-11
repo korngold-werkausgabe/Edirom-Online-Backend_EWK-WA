@@ -78,6 +78,7 @@ jobs:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           gh workflow run release-docker-image.yml \
+            --repo ${{ github.repository }} \
             --ref ${{ github.ref_name }} \
             -f build_sha=${{ github.sha }} \
             -f run_id=${{ github.run_id }}
