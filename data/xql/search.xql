@@ -106,7 +106,7 @@ let $return :=
                 
                 (: Work :)
                 else if (exists($doc//mei:mei) and exists($doc//mei:work)) then
-                    (eutil:getLocalizedTitle($doc//mei:work/mei:titleStmt, $lang))
+                    (eutil:getLocalizedTitle($doc//mei:workList/mei:work/mei:titleStmt, $lang))
                 
                 (: Source / Score :)
                 else if (exists($doc//mei:mei) and exists($doc//mei:source)) then
