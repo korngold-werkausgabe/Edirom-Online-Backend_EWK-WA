@@ -29,7 +29,7 @@ declare option output:media-type "text/html";
 
 (: VARIABLE DECLARATIONS =================================================== :)
 
-declare variable $lang := request:get-parameter('lang', '');
+declare variable $lang := eutil:getSetLanguage(());
 
 (: QUERY BODY ============================================================== :)
 
@@ -44,7 +44,7 @@ return
     
     <div class="annotView">
         <div class="contentBox">
-            <h1>{annotation:getTitle($annot, $lang)}</h1>
+            <h1>{eutil:getLocalizedName($annot, $lang)}</h1>
             {annotation:getContent($annot, '', $edition)}
         </div>
     </div>
