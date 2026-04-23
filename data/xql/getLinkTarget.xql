@@ -29,7 +29,7 @@ declare option output:media-type "application/json";
 
 (: VARIABLE DECLARATIONS =================================================== :)
 
-declare variable $lang := request:get-parameter('lang', '');
+declare variable $lang := eutil:getSetLanguage(());
 declare variable $uri := request:get-parameter('uri', '');
 
 (: FUNCTION DECLARATIONS =================================================== :)
@@ -163,7 +163,7 @@ declare function local:getWindowTitle($doc as document-node()?, $type as xs:stri
             (: MEI 3 and older :)
             ($doc//mei:work)[1]/mei:titleStmt,
             (: MEI 4 and newer :)
-            ($doc//mei:work)[1]
+            ($doc//mei:workList/mei:work)[1]
         )[1]
     
         return

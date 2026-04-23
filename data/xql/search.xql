@@ -50,7 +50,7 @@ declare function local:getPath($node as node()) as xs:string {
 
 (: QUERY BODY ============================================================== :)
 
-let $lang := request:get-parameter('lang', '')
+let $lang := eutil:getSetLanguage(())
 let $edition := request:get-parameter('edition', '')
 let $term := request:get-parameter('term', '')
 
@@ -106,7 +106,7 @@ let $return :=
                 
                 (: Work :)
                 else if (exists($doc//mei:mei) and exists($doc//mei:work)) then
-                    (eutil:getLocalizedTitle($doc//mei:work/mei:titleStmt, $lang))
+                    (eutil:getLocalizedTitle($doc//mei:workList/mei:work/mei:titleStmt, $lang))
                 
                 (: Source / Score :)
                 else if (exists($doc//mei:mei) and exists($doc//mei:source)) then
