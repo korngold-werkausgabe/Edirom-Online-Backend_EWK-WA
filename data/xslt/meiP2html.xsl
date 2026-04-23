@@ -166,6 +166,11 @@
             </xsl:if>
         </img>
     </xsl:template>
+    <xsl:template match="mei:graphic">
+        <img class="fig">
+            <xsl:attribute name="src" select="./data(@target)"/>
+        </img>
+    </xsl:template>
     <xsl:template match="text()">
         <xsl:copy/>
     </xsl:template>
