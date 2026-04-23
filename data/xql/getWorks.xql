@@ -33,5 +33,5 @@ return
     array {
         for $workUri in $workUris
         return
-            work:details($workUri, $uri)
+            work:details($workUri)
     }
