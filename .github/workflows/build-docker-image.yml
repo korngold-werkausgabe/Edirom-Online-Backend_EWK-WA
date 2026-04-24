@@ -8,6 +8,7 @@ on:
       - completed
     branches:
       - dev-ewk
+      - bug/9-gh-action-fails
 
 jobs:
   docker:
@@ -74,7 +75,7 @@ jobs:
       - name: Trigger release-docker-image workflow
         if: success()
         env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh workflow run release-docker-image.yml \
             --repo ${{ github.repository }} \

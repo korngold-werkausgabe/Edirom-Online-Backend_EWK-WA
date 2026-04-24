@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - dev-ewk
+      - bug/9-gh-action-fails
 
 jobs:
   build:
