@@ -59,15 +59,30 @@ jobs:
           name: eob-ewk
           path: .
 
-      - name: Rename XAR file
+      - name: Extract version and prepare files
+        id: version
         run: |
-          mv Edirom-Online-Backend*.xar eob-ewk-latest.xar
+          XAR_FILE=$(ls Edirom-Online-Backend*.xar | head -1)
+          VERSION=$(echo "$XAR_FILE" | grep -oP '(?<=Edirom-Online-Backend-)[^-]+')
+          echo "xar_file=$XAR_FILE" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          cp "$XAR_FILE" eob-ewk-latest.xar
 
-      - name: Upload XAR to Release
+      - name: Upload XAR to versioned Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          files: ${{ steps.version.outputs.xar_file }}
+          name: Release ${{ steps.version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update latest Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest
           files: eob-ewk-latest.xar
           name: Latest Release
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
