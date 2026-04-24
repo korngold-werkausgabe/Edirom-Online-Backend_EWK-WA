@@ -57,6 +57,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: eob-ewk
+          path: .
 
       - name: Rename XAR file
         run: |
