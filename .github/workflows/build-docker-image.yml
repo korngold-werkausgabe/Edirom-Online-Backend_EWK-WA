@@ -75,7 +75,7 @@ jobs:
       - name: Trigger release-docker-image workflow
         if: success()
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           gh workflow run release-docker-image.yml \
             --repo ${{ github.repository }} \
