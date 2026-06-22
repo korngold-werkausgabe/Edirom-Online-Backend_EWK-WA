@@ -25,7 +25,7 @@ jobs:
         run: ant xar
 
       - name: Copy XAR to fixed file name
-        run: cp build/*.xar eob-ewk-latest.xar
+        run: cp build-xar/*.xar eob-ewk-latest.xar
 
       # --- Build Dockerimage ---
       - name: Login to GitHub Packages Docker
