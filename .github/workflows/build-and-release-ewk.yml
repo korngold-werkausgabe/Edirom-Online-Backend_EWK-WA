@@ -30,7 +30,7 @@ jobs:
         run: ant xar
 
       - name: Copy XAR to fixed file name
-        run: cp build/*.xar eob-ewk-latest.xar
+        run: cp build-xar/*.xar eob-ewk-latest.xar
 
       # --- Build Docker image with existdb ---
       - name: Login to GitHub Packages Docker
