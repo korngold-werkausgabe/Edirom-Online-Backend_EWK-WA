@@ -48,8 +48,8 @@ jobs:
 
       - name: Build multiarch image and push
         env:
-          IMAGE_NAME_GHCR: ghcr.io/yourorg/yourimage:latest
-          IMAGE_NAME_DOCKERHUB: yourdockerhubuser/yourimage:latest
+          IMAGE_NAME_GHCR: ghcr.io/${{ github.actor }}/eob-ewk:latest
+          IMAGE_NAME_DOCKERHUB: ${{ secrets.DOCKERHUB_USERNAME }}/eob-ewk:latest
         run: |
           cat <<EOF > Dockerfile
           FROM stadlerpeter/existdb
