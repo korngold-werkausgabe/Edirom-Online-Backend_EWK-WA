@@ -18,18 +18,14 @@ jobs:
         uses: actions/checkout@v3
 
       # --- Build XAR ---
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+      - name: Install Ant
+        run: sudo apt-get update && sudo apt-get install -y ant
 
-      - name: Build XAR
-        run: ./gradlew clean xar
+      - name: Build XAR with Ant
+        run: ant xar
 
       - name: Copy XAR to fixed file name
-        run: |
-          cp build/libs/*.xar release.xar
+        run: cp build/*.xar eob-ewk-latest.xar
 
       # --- Build Dockerimage ---
       - name: Login to GitHub Packages Docker
@@ -53,7 +49,7 @@ jobs:
       - name: Upload XAR as Release Asset
         uses: softprops/action-gh-release@v1
         with:
-          files: release.xar
+          files: eob-ewk-latest.xar
 
       # --- Release Dockerimage ---
       - name: Push Docker image to GitHub Container Registry
