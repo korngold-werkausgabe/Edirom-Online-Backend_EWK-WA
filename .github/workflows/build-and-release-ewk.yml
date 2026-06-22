@@ -8,6 +8,8 @@ on:
 
 env:
   IMAGE_NAME: eob-ewk
+  IMAGE_NAME_GHCR: ghcr.io/korngold-werkausgabe/eob-ewk-backend:latest
+  IMAGE_NAME_DOCKERHUB: ${{ secrets.DOCKERHUB_USERNAME }}/eob-ewk-backend:latest
 
 jobs:
   build-and-release:
@@ -43,7 +45,7 @@ jobs:
 
       - name: Build Docker image with latest tag
         run: |
-          docker build -t ghcr.io/${{ github.repository }}:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest .
+          docker build -t ${{ env.IMAGE_NAME_GHCR }} -t ${{ env.IMAGE_NAME_DOCKERHUB }} .
 
       # --- Release XAR ---
       - name: Upload XAR as Release Asset
@@ -54,8 +56,8 @@ jobs:
       # --- Release Dockerimage ---
       - name: Push Docker image to GitHub Container Registry
         run: |
-          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ${{ env.IMAGE_NAME_GHCR }}
 
       - name: Push Docker image to DockerHub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.IMAGE_NAME_DOCKERHUB }}
