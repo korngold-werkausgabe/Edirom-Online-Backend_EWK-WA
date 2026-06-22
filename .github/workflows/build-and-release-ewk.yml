@@ -5,6 +5,9 @@ on:
     branches:
       - dev-ewk
       - bug/9-gh-action-fails
+    tags:
+      - "v*"
+      - "release-*"
 
 env:
   IMAGE_NAME: eob-ewk
@@ -48,7 +51,14 @@ jobs:
           docker build -t ${{ env.IMAGE_NAME_GHCR }} -t ${{ env.IMAGE_NAME_DOCKERHUB }} .
 
       # --- Release XAR ---
+      - name: Upload XAR as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eob-ewk-latest.xar
+          path: eob-ewk-latest.xar
+
       - name: Upload XAR as Release Asset
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: eob-ewk-latest.xar
