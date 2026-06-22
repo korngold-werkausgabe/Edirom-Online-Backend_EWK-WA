@@ -79,4 +79,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: eob-ewk-latest.xar
-          files: eob-ewk-latest.xar
