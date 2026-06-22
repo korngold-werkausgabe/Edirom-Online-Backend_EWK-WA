@@ -46,13 +46,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker image with existdb and autodeploy
+      - name: Build multiarch image and push
+        env:
+          IMAGE_NAME_GHCR: ghcr.io/yourorg/yourimage:latest
+          IMAGE_NAME_DOCKERHUB: yourdockerhubuser/yourimage:latest
         run: |
           cat <<EOF > Dockerfile
           FROM stadlerpeter/existdb
           COPY eob-ewk-latest.xar /exist/autodeploy/
           EOF
-          docker buildx build --platform linux/amd64,linux/arm64 -t $IMAGE_NAME_GHCR -t $IMAGE_NAME_DOCKERHUB .
+
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t $IMAGE_NAME_GHCR \
+            -t $IMAGE_NAME_DOCKERHUB \
+            --push .
 
       # --- Release XAR ---
       - name: Upload eob-ewk-latest.xar as Artifact
