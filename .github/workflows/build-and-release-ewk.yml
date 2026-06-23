@@ -25,6 +25,9 @@ jobs:
       # --- Build XAR ---
       - name: Install Ant
         run: sudo apt-get update && sudo apt-get install -y ant
+      
+      - name: Clean
+        run: ant clean
 
       - name: Build XAR with Ant
         run: ant xar
