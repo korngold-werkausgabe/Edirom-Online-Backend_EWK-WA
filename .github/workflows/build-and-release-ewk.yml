@@ -61,7 +61,7 @@ jobs:
         run: |
           cat <<EOF > Dockerfile
           FROM stadlerpeter/existdb
-          COPY eob-ewk-latest.xar /exist/autodeploy/
+          COPY eob-ewk-latest.xar /opt/exist/autodeploy/
           EOF
 
           docker buildx build \
