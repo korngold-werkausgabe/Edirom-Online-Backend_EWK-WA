@@ -49,18 +49,6 @@ declare function work:details($uri as xs:string) as map(*) {
  : @return Is work or not
  :)
 declare function work:isWork($uri as xs:string) as xs:boolean {
-
-    let $doc := eutil:getDoc($uri)
-    return (
-        (
-            exists($doc//mei:mei)
-            and exists($doc//mei:work)
-            and not($doc//mei:source)
-        )
-        or
-            exists($doc/mei:work)
-    )
-
     let $doc := eutil:getDoc($uri)
     return (
         (
@@ -82,8 +70,8 @@ declare function work:isWork($uri as xs:string) as xs:boolean {
  :)
 declare function work:getLabel($work as xs:string, $edition as xs:string) as xs:string {
     let $root := doc($work)/mei:mei | doc($work)/mei:work
-    let $work := $root//mei:workList/mei:work | $root/mei:work
-    return eutil:getLocalizedTitle($work, request:get-parameter('lang', ''))
+    let $workElem := $root//mei:workList/mei:work | $root/mei:work
+    return eutil:getLocalizedTitle($workElem, request:get-parameter('lang', ''))
 };
 
 (:~
@@ -93,8 +81,8 @@ declare function work:getLabel($work as xs:string, $edition as xs:string) as xs:
  : @return The id
  :)
 declare function work:findWorkID($uri as xs:string) as xs:string {
- 
-    eutil:getDoc($uri)//edirom:work[1]/data(@xml:id)
-    eutil:getDoc($uri)//edirom:work[1]/data(@xml:id)
-
+    let $doc := eutil:getDoc($uri)
+    let $root := $doc/mei:mei | $doc/mei:work
+    return
+        (($root//mei:workList/mei:work | $root/mei:work | $doc//edirom:work)[1]/@xml:id/string(), "")[1]
 };
