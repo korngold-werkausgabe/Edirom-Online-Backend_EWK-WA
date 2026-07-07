@@ -60,6 +60,17 @@ declare function work:isWork($uri as xs:string) as xs:boolean {
         or
             exists($doc/mei:work)
     )
+
+    let $doc := eutil:getDoc($uri)
+    return (
+        (
+            exists($doc//mei:mei)
+            and exists($doc//mei:work)
+            and not($doc//mei:source)
+        )
+        or
+            exists($doc/mei:work)
+    )
 };
 
 (:~
@@ -83,6 +94,7 @@ declare function work:getLabel($work as xs:string, $edition as xs:string) as xs:
  :)
 declare function work:findWorkID($uri as xs:string) as xs:string {
  
+    eutil:getDoc($uri)//edirom:work[1]/data(@xml:id)
     eutil:getDoc($uri)//edirom:work[1]/data(@xml:id)
 
 };
