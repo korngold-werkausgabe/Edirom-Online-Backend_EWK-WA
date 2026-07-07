@@ -48,12 +48,12 @@ return
                 $file//*[local-name() = 'entry'] ! map:entry(./string(@key), ./string(@value)), 
                 $projectFile//*[local-name() = 'entry'] ! map:entry(./string(@key), ./string(@value)),
                 map:entry(
-                    "web-components",
+                    'web-components',
                     map:merge(
                         ($file//*[local-name() = 'web-component'], $projectFile//*[local-name() = 'web-component']) ! map:entry(./string(@key),
-                            map:merge(
-                                .//option ! map:entry(./string(@key), ./string(@value))
-                            )
+                            let $options := .//*[local-name() = 'option'] ! map:entry(./string(@key), ./string(@value))
+                            return
+                                if (exists($options)) then map:merge($options) else map{}
                         )
                     )
                 )
