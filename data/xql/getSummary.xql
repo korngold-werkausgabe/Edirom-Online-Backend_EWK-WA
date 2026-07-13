@@ -44,8 +44,8 @@ declare function local:generateRespSentence($names) {
 
 declare function local:getSourceSummary($doc, $facsBasePath, $server) {
     let $work := eutil:getDoc($doc//mei:relation[@rel = 'isEmbodimentOf'][1]/substring-before(@target, '#'))
-    let $title := $work//mei:work/mei:titleStmt/mei:title[1]/text()
-    let $resp := local:generateRespSentence($work//mei:work/mei:titleStmt/mei:respStmt/*[local-name() != 'resp']/text())
+    let $title := $work//mei:workList/mei:work/mei:titleStmt/mei:title[1]/text()
+    let $resp := local:generateRespSentence($work//mei:workList/mei:work/mei:titleStmt/mei:respStmt/*[local-name() != 'resp']/text())
     let $expression := $work/id($doc//mei:relation[@rel = 'isEmbodimentOf'][1]/substring-after(@target, '#'))/string(@label)
     
     return
@@ -261,7 +261,7 @@ declare function local:getWorkSummary($doc, $docUri) {
             <div
                 class="resps">
                 {
-                    for $resp in $doc//mei:work/mei:titleStmt/mei:respStmt/mei:*[not(local-name() eq 'resp') and @role]
+                    for $resp in $doc//mei:workList/mei:work/mei:titleStmt/mei:respStmt/mei:*[not(local-name() eq 'resp') and @role]
                     return
                         (
                         <div
@@ -274,17 +274,17 @@ declare function local:getWorkSummary($doc, $docUri) {
             
             <h1>
                 {
-                    if ($doc//mei:work/mei:titleStmt/mei:title[@type eq 'main']) then
-                        ($doc//mei:work/mei:titleStmt/mei:title[@type eq 'main'][1]//text())
+                    if ($doc//mei:workList/mei:work/mei:titleStmt/mei:title[@type eq 'main']) then
+                        ($doc//mei:workList/mei:work/mei:titleStmt/mei:title[@type eq 'main'][1]//text())
                     else
-                        ($doc//mei:work/mei:titleStmt/mei:title[1]//text())
+                        ($doc//mei:workList/mei:work/mei:titleStmt/mei:title[1]//text())
                 }
             </h1>
             
             <div
                 class="identifiers">
                 {
-                    for $ident in $doc//mei:work/mei:identifier
+                    for $ident in $doc//mei:workList/mei:work/mei:identifier
                     return
                         <div
                             class="identifier">
@@ -301,7 +301,7 @@ declare function local:getWorkSummary($doc, $docUri) {
         <div
             class="expressions">
             {
-                for $expression in $doc//mei:work/mei:expressionList/mei:expression
+                for $expression in $doc//mei:workList/mei:work/mei:expressionList/mei:expression
                 let $label := $expression/string(@label)
                 let $target := concat($docUri, '#', $expression/@xml:id)
                 let $manifestations := for $source in //mei:relation[@target = $target and @rel = 'isEmbodimentOf']/root()

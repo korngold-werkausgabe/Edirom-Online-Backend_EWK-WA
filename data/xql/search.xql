@@ -114,10 +114,10 @@ let $return :=
                 (: Work :)
                 else if (exists($doc//mei:mei) and exists($doc//mei:work)) then
                     (: MEI3: titleStmt exists inside mei:work :)
-                    if (exists($doc//mei:work/mei:titleStmt)) then
+                    if (exists($doc//mei:workList/mei:work/mei:titleStmt)) then
                         eutil:getLocalizedTitle($doc//mei:work/mei:titleStmt, $lang)
                     (: MEI4/5: title is a direct child of mei:work :)
-                    else if (exists($doc//mei:work/mei:title)) then
+                    else if (exists($doc//mei:workList/mei:work/mei:title)) then
                         eutil:getLocalizedTitle($doc//mei:work, $lang)
                     (: fallback: use fileDesc/titleStmt :)
                     else
