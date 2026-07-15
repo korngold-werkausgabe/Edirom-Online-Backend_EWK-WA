@@ -32,9 +32,9 @@ declare option output:indent "yes";
 let $mode := request:get-parameter('mode', '')
 let $edition := request:get-parameter('edition', '')
 
-let $file := doc($eutil:default-prefs-location)
+let $file := eutil:getDoc($eutil:default-prefs-location)
 
-let $projectFile := doc(edition:getPreferencesURI($edition))
+let $projectFile := eutil:getDoc(edition:getPreferencesURI($edition))
 
 return
     if ($mode = 'json') then (
@@ -45,18 +45,18 @@ return
             </output:serialization-parameters>
         let $data := 
             map:merge((
-                $file//*[local-name() = 'entry'] ! map:entry(./string(@key), ./string(@value)), 
-                $projectFile//*[local-name() = 'entry'] ! map:entry(./string(@key), ./string(@value)),
+                $file//(pref:entry|entry) ! map:entry(./string(@key), ./string(@value)), 
+                $projectFile//(pref:entry|entry) ! map:entry(./string(@key), ./string(@value)),
                 map:entry(
                     "web-components",
                     map:merge(
                         ($file//*[local-name() = 'web-component'], $projectFile//*[local-name() = 'web-component']) ! map:entry(./string(@key),
                             map:merge(
-                                .//option ! map:entry(./string(@key), ./string(@value))
+                                .//(pref:option|option) ! map:entry(./string(@key), ./string(@value))
                             )
                         )
                     )
-                )
+                ) 
             ))
         return
             response:stream($data => serialize($outputOptions), $serializationParameters)

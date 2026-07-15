@@ -29,8 +29,8 @@ declare namespace request = "http://exist-db.org/xquery/request";
  : @return a map object with the keys "id", "doc", and "title" 
  :)
 declare function work:details($uri as xs:string) as map(*) {
-    
-    let $root := doc($uri)/mei:mei | doc($uri)/mei:work
+    let $doc := eutil:getDoc($uri)
+    let $root := $doc/mei:mei | $doc/mei:work
     let $work := ($root//mei:workList/mei:work | $root/mei:work)[1]
     let $lang := request:get-parameter('lang', '')
     
@@ -49,9 +49,17 @@ declare function work:details($uri as xs:string) as map(*) {
  : @return Is work or not
  :)
 declare function work:isWork($uri as xs:string) as xs:boolean {
-    
-    (exists(doc($uri)//mei:mei) and exists(doc($uri)//mei:work) and not(doc($uri)//mei:source)) or exists(doc($uri)/mei:work)
 
+    let $doc := eutil:getDoc($uri)
+    return (
+        (
+            exists($doc//mei:mei)
+            and exists($doc//mei:work)
+            and not($doc//mei:source)
+        )
+        or
+            exists($doc/mei:work)
+    )
 };
 
 (:~
@@ -62,7 +70,8 @@ declare function work:isWork($uri as xs:string) as xs:boolean {
  : @return The label
  :)
 declare function work:getLabel($work as xs:string, $edition as xs:string) as xs:string {
-    let $root := doc($work)/mei:mei | doc($work)/mei:work
+    let $doc := eutil:getDoc($work)
+    let $root := $doc/mei:mei | $doc/mei:work
     let $work := $root//mei:workList/mei:work | $root/mei:work
     return eutil:getLocalizedTitle($work, request:get-parameter('lang', ''))
 };
@@ -75,6 +84,6 @@ declare function work:getLabel($work as xs:string, $edition as xs:string) as xs:
  :)
 declare function work:findWorkID($uri as xs:string) as xs:string {
  
-    doc($uri)//edirom:work[1]/data(@xml:id)
+    eutil:getDoc($uri)//edirom:work[1]/data(@xml:id)
 
 };
