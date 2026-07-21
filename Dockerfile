@@ -14,8 +14,8 @@ FROM eclipse-temurin:21 AS builder
 ARG ROASTER_VERSION=1.11.0
 
 # installing Apache Ant
-RUN apt-get install -y --no-install-recommends apt-transport-https \
-    && apt-get update \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends apt-transport-https \
     && apt-get install -y --no-install-recommends ant curl zip unzip patch git
 
 WORKDIR /opt/eo-backend
