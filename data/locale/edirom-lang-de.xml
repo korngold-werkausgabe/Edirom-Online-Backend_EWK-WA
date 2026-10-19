@@ -33,6 +33,12 @@
         
         <entry key="controller.desktop.TaskBar_confirmReload" value="Die Anwendung muss neu gestartet werden, damit die Spracheinstellung vollständig umgesetzt wird."/>
         
+        <entry key="controller.navigator.Navigator_NavigationTab" value="Navigation"/>
+        <entry key="controller.navigator.Navigator_NoContent" value="Keine Einträge vorhanden."/>
+        <entry key="controller.navigator.Navigator_ConcordanceTab" value="Konkordanz"/>
+        <entry key="controller.navigator.Navigator_ConcordanceDocuments" value="Weitere Dokumente"/>
+        <entry key="controller.navigator.Navigator_ConcordanceExternalResources" value="Weitere Ressourcen"/>
+
         <entry key="controller.window.Window_annotationView" value="Anmerkung"/>
         <entry key="controller.window.Window_headerView" value="Metadaten"/>
         <entry key="controller.window.Window_renderingView" value="Rendering"/>
@@ -70,7 +76,6 @@
         <entry key="view.desktop.TaskBar_search" value="Suche"/>
         <entry key="view.desktop.TaskBar_switchToMobile" value="Zur mobilen Ansicht wechseln"/>
         <entry key="view.desktop.TaskBar_about" value="About"/>
-        <entry key="view.desktop.TaskBar_Desktop" value="Desktop {0}"/>
         <entry key="view.desktop.TaskBar_searchWin" value="Öffne Suchfenster"/>
         <entry key="view.desktop.TaskBar_Sort_grid" value="Im Raster anordnen"/>
         <entry key="view.desktop.TaskBar_Sort_vertical" value="Übereinander anordnen" />

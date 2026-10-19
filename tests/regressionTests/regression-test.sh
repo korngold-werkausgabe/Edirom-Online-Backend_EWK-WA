@@ -44,6 +44,11 @@ declare -a ENDPOINTS=(
 "/data/xql/getiFrameURL.xql?uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Ftexts%2Ftext-7.xml%3Fterm%3Dnull%26path%3Dnull%23searchTarget&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
 "/data/xql/getInternalIdType.xql?uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fsources%2Fsource-1.xml%23bar-2002&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
 "/data/xql/getLanguageFile.xql?lang=de&mode=json&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml"
+"/data/xql/getLinkTarget.xql?uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fsources%2Fsource-1.xml&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
+"/data/xql/getLinkTarget.xql?uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Ftexts%2Ftext-1.xml&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
+"/data/xql/getLinkTarget.xql?uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fsources%2Fsource-4-MEI.xml%23annotation-2&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
+"/data/xql/getLinkTarget.xql?uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fdoes-not-exist.xml&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
+"/data/xql/getLinkTargets.xql?uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fsources%2Fsource-1.xml&uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Ftexts%2Ftext-1.xml&uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fsources%2Fsource-4-MEI.xml%23annotation-2&uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fdoes-not-exist.xml&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
 "/data/xql/getMeasure.xql?id=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fsources%2Fsource-1.xml&measureId=bar-20016%3Ftstamp2%3D2m%2B0&lang=de"
 "/data/xql/getMeasurePage.xql?id=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fsources%2Fsource-1.xml&measure=bar-2001&measureCount=1&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
 "/data/xql/getMeasures.xql?uri=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fsources%2Fsource-1.xml&mdiv=part-1&edition=xmldb%3Aexist%3A%2F%2F%2Fdb%2Fapps%2Fweber-klarinettenquintett-eol-emeritus%2Fedition.xml&lang=de"
@@ -86,6 +91,10 @@ normalize_file() {
   local file="$1"
   # replace host and port number with xxxx to avoid false positives
   sed "${SED_OPTION[@]}" 's/localhost:[0-9]+/xxxx/g' "$file"
+
+  # replace IDs starting with PD123N with PDxxxN to avoid false positives
+  # see https://github.com/Edirom/Edirom-Online-Backend/pull/210
+  sed "${SED_OPTION[@]}" 's/PD[0-9]+N/PDxxxN/g' "$file"
 }
 
 # Main function to check the endpoints against the expected results.
